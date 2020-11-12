@@ -2,18 +2,19 @@ package tomoya;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-//单例模式
-class Singleton{
-    private volatile static Singleton singleton;
-    public static Singleton getInstance(){
-        if (null==singleton){
-            synchronized (Singleton.class){
-                if (null==singleton){
-                    singleton=new Singleton() ;
+//单例模式(双重校验锁)
+public class Singleton {
+    private volatile static Singleton uniqueSingleton;//singleton = new Singleton() 这句话可以分为三步:1.为 singleton分配内存空间;2.初始化singleton;3.将singleton指向分配的内存空间
+    //但是由于JVM具有指令重排的特性，执行顺序有可能变成 1-3-2,返回的singleton可能还没有被初始化，所以用volatile保证有序性
+    public static Singleton getInstance() {
+        if (null == uniqueSingleton) { // 第一次校验，作用是不用竞争锁
+            synchronized (Singleton.class) {
+                if (null == uniqueSingleton) {//第二次校验，防止二次创建实例
+                    uniqueSingleton = new Singleton();
                 }
             }
         }
-        return singleton;
+        return uniqueSingletovn;
     }
 }
 //LRU
